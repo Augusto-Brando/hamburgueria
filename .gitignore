@@ -1,0 +1,5 @@
+# Pasta de saída de compilação do IntelliJ
+out/
+
+# Sistema operacional
+.DS_Store
