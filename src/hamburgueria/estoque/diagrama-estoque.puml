@@ -1,0 +1,47 @@
+@startuml diagrama-estoque
+skinparam classAttributeIconSize 0
+skinparam classFontStyle Bold
+title Domínio: estoque\n(Padrão: Proxy)
+
+interface IEstoque {
+  + getQuantidade(ingrediente : String) : int
+  + adicionarIngrediente(ingrediente : String, quantidade : int)
+  + consumirIngrediente(ingrediente : String, quantidade : int)
+}
+
+class Estoque implements IEstoque {
+  - ingredientes : Map<String, Integer>
+  --
+  + getQuantidade(ingrediente : String) : int
+  + adicionarIngrediente(ingrediente : String, quantidade : int)
+  + consumirIngrediente(ingrediente : String, quantidade : int)
+}
+
+class EstoqueProxy implements IEstoque {
+  - estoqueReal : IEstoque
+  - funcionario : Funcionario
+  --
+  + EstoqueProxy(funcionario : Funcionario)
+  + getQuantidade(ingrediente : String) : int
+  + adicionarIngrediente(ingrediente : String, quantidade : int)
+  + consumirIngrediente(ingrediente : String, quantidade : int)
+  - getEstoqueReal() : IEstoque
+}
+
+class Funcionario {
+  - nome : String
+  - ehGerente : boolean
+  --
+  + getNome() : String
+  + ehGerente() : boolean
+}
+
+EstoqueProxy o--> Estoque : estoqueReal (lazy)
+EstoqueProxy --> Funcionario
+
+note right of EstoqueProxy
+  <b>Proxy de Proteção</b>
+  Só gerentes veem quantidades;
+  cria Estoque sob demanda (lazy)
+end note
+@enduml
