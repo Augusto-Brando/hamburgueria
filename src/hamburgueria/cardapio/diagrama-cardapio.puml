@@ -1,0 +1,80 @@
+@startuml diagrama-cardapio
+skinparam classAttributeIconSize 0
+skinparam classFontStyle Bold
+title Domínio: cardapio\n(Padrões: Composite · Decorator · Builder · Factory Method · Iterator)
+
+' ── Composite ──────────────────────────────────────────────────────────
+interface ItemCardapio <<Composite Component>> {
+  + getNome() : String
+  + getPreco() : double
+  + getDescricao() : String
+}
+
+class PratoSimples <<Leaf>> implements ItemCardapio {
+  - nome : String
+  - preco : double
+  - descricao : String
+}
+
+class Combo <<Composite>> implements ItemCardapio {
+  - nome : String
+  - itens : List<ItemCardapio>
+  --
+  + adicionar(item : ItemCardapio)
+  + remover(item : ItemCardapio)
+  + getItens() : List<ItemCardapio>
+}
+Combo o--> ItemCardapio : itens
+
+' ── Decorator ──────────────────────────────────────────────────────────
+class Lanche implements ItemCardapio {
+  - nome : String
+  - precoBase : double
+}
+
+abstract class LancheDecorator <<Decorator>> implements ItemCardapio {
+  # lanche : ItemCardapio
+}
+LancheDecorator o--> ItemCardapio : lanche
+
+class ComQueijo extends LancheDecorator
+class ComBacon  extends LancheDecorator
+class ComSalada extends LancheDecorator
+
+' ── Builder ────────────────────────────────────────────────────────────
+class Hamburguer {
+  - tipo : String
+  - pao : String
+  - carne : String
+  - adicionais : List<String>
+  - preco : double
+}
+
+class HamburguerBuilder <<Builder>> {
+  + tipo(tipo : String) : HamburguerBuilder
+  + pao(pao : String) : HamburguerBuilder
+  + carne(carne : String) : HamburguerBuilder
+  + adicional(a : String) : HamburguerBuilder
+  + preco(p : double) : HamburguerBuilder
+  + build() : Hamburguer
+}
+HamburguerBuilder ..> Hamburguer : cria
+
+' ── Factory Method ─────────────────────────────────────────────────────
+abstract class FabricaItemCardapio <<Factory Method>> {
+  + {abstract} criarItem() : ItemCardapio
+  + pedirItem() : ItemCardapio
+}
+class FabricaLancheClassico extends FabricaItemCardapio
+class FabricaComboFamilia   extends FabricaItemCardapio
+FabricaItemCardapio ..> ItemCardapio : cria
+
+' ── Iterator ───────────────────────────────────────────────────────────
+class Cardapio <<Iterator>> implements Iterable {
+  - itens : List<ItemCardapio>
+  --
+  + adicionarItem(item : ItemCardapio)
+  + iterator() : Iterator<ItemCardapio>
+}
+Cardapio o--> ItemCardapio : itens
+@enduml
