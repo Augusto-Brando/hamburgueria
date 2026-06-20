@@ -1,0 +1,59 @@
+@startuml diagrama-pedido
+skinparam classAttributeIconSize 0
+skinparam classFontStyle Bold
+title Domínio: pedido\n(Padrões: State · Strategy · Template Method · Observer)
+
+' ── State ──────────────────────────────────────────────────────────────
+interface EstadoPedido <<State>> {
+  + avancar(pedido : Pedido)
+  + cancelar(pedido : Pedido)
+  + getDescricao() : String
+}
+class EstadoRecebido  implements EstadoPedido
+class EstadoEmPreparo implements EstadoPedido
+class EstadoPronto    implements EstadoPedido
+class EstadoEntregue  implements EstadoPedido
+class EstadoCancelado implements EstadoPedido
+
+note bottom of EstadoRecebido
+  Singletons de estado
+end note
+
+' ── Strategy ───────────────────────────────────────────────────────────
+interface EstrategiaPreco <<Strategy>> {
+  + calcularTotal(subtotal : double) : double
+}
+class PrecoNormal          implements EstrategiaPreco
+class PrecoComDesconto     implements EstrategiaPreco { - percentualDesconto : double }
+class PrecoComTaxaEntrega  implements EstrategiaPreco { - taxaEntrega : double }
+
+' ── Pedido (Template Method + State + Observer subject) ────────────────
+class Pedido {
+  - numero : String
+  - itens : List<ItemCardapio>
+  - estado : EstadoPedido
+  - estrategiaPreco : EstrategiaPreco
+  - observadores : List<ObservadorPedido>
+  --
+  + adicionarObservador(obs : ObservadorPedido)
+  + avancarEstado()
+  + cancelar()
+  + adicionarItem(item : ItemCardapio)
+  # calcularSubtotal() : double
+  + calcularTotal() : double
+  + getStatusAtual() : String
+}
+
+Pedido --> EstadoPedido     : estado (State)
+Pedido --> EstrategiaPreco  : estrategiaPreco (Strategy)
+Pedido o--> "0..*" ObservadorPedido : observadores (Observer)
+
+note right of Pedido
+  <b>Template Method</b>: calcularTotal()
+  chama calcularSubtotal() + EstrategiaPreco
+end note
+
+interface ObservadorPedido {
+  + notificar(numeroPedido : String, novoStatus : String)
+}
+@enduml
