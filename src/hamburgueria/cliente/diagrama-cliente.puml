@@ -1,0 +1,37 @@
+@startuml diagrama-cliente
+skinparam classAttributeIconSize 0
+skinparam classFontStyle Bold
+title Domínio: cliente\n(Padrões: Prototype + Observer)
+
+interface ObservadorPedido <<Observer>> {
+  + notificar(numeroPedido : String, novoStatus : String)
+}
+
+interface Cloneable <<Java>>
+
+class Endereco implements Cloneable {
+  - rua : String
+  - numero : String
+  - bairro : String
+  --
+  + clone() : Endereco
+}
+
+class Cliente implements Cloneable, ObservadorPedido {
+  - nome : String
+  - telefone : String
+  - endereco : Endereco
+  - historicoPedidos : List<String>
+  --
+  + clone() : Cliente
+  + notificar(numeroPedido : String, novoStatus : String)
+  + getHistorico() : List<String>
+}
+
+Cliente *--> Endereco : endereco
+
+note right of Cliente
+  <b>Prototype</b>: clone() copia profunda
+  <b>Observer</b>: recebe updates de pedidos
+end note
+@enduml
